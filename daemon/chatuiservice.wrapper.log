@@ -1,0 +1,34 @@
+2025-06-20 19:32:55 - Starting C:\Program Files\nodejs\node.exe  "C:\Users\Acer\Downloads\Assignment 12\Assignment 12\chat-ui-app\node_modules\node-windows\lib\wrapper.js" --file "C:\Users\Acer\Downloads\Assignment 12\Assignment 12\chat-ui-app\server.js" --scriptoptions= --log "ChatUI Service wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2025-06-20 19:32:55 - Started 15128
+2025-06-20 19:35:19 - Stopping chatuiservice.exe
+2025-06-20 19:35:19 - ProcessKill 15128
+2025-06-20 19:35:19 - Shutdown exception
+Message:A system shutdown is in progress.
+
+Stacktrace:   at System.Runtime.InteropServices.Marshal.ThrowExceptionForHRInternal(Int32 errorCode, IntPtr errorInfo)
+   at System.Management.ManagementScope.InitializeGuts(Object o)
+   at System.Management.ManagementScope.Initialize()
+   at System.Management.ManagementObjectSearcher.Initialize()
+   at System.Management.ManagementObjectSearcher.Get()
+   at winsw.WrapperService.GetChildPids(Int32 pid)
+   at winsw.WrapperService.StopProcessAndChildren(Int32 pid)
+   at winsw.WrapperService.StopIt()
+   at winsw.WrapperService.OnShutdown()
+2025-06-20 19:35:56 - Starting C:\Program Files\nodejs\node.exe  "C:\Users\Acer\Downloads\Assignment 12\Assignment 12\chat-ui-app\node_modules\node-windows\lib\wrapper.js" --file "C:\Users\Acer\Downloads\Assignment 12\Assignment 12\chat-ui-app\server.js" --scriptoptions= --log "ChatUI Service wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2025-06-20 19:35:56 - Started 7780
+2025-06-20 19:37:17 - Stopping chatuiservice.exe
+2025-06-20 19:37:17 - ProcessKill 7780
+2025-06-20 19:37:17 - Found child process: 7820 Name: conhost.exe
+2025-06-20 19:37:17 - Found child process: 8968 Name: node.exe
+2025-06-20 19:37:17 - Stopping process 7820
+2025-06-20 19:37:17 - Send SIGINT 7820
+2025-06-20 19:37:17 - SIGINT to 7820 failed - Killing as fallback
+2025-06-20 19:37:17 - Stopping process 8968
+2025-06-20 19:37:17 - Send SIGINT 8968
+2025-06-20 19:37:17 - SIGINT to 8968 failed - Killing as fallback
+2025-06-20 19:37:17 - Stopping process 7780
+2025-06-20 19:37:17 - Send SIGINT 7780
+2025-06-20 19:37:17 - SIGINT to 7780 failed - Killing as fallback
+2025-06-20 19:37:17 - Finished chatuiservice.exe
+2025-06-20 19:38:38 - Starting C:\Program Files\nodejs\node.exe  "C:\Users\Acer\Downloads\Assignment 12\Assignment 12\chat-ui-app\node_modules\node-windows\lib\wrapper.js" --file "C:\Users\Acer\Downloads\Assignment 12\Assignment 12\chat-ui-app\server.js" --scriptoptions= --log "ChatUI Service wrapper" --grow 0.25 --wait 1 --maxrestarts 3 --abortonerror n --stopparentfirst undefined
+2025-06-20 19:38:38 - Started 9128

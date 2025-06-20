@@ -1,0 +1,36 @@
+Server running on port 7777
+To connect from other computers on your network, use http://<your-ip-address>:7777
+New client connected: yeMDh7yYTUgkQMdBAAAB
+New client connected: ZQWTMSh-KzPE7v5EAAAD
+Message received: {
+  id: 1750428261090,
+  text: 'Hlo',
+  sender: 'ZQWTMSh-KzPE7v5EAAAD',
+  senderName: 'Tanmy',
+  to: null,
+  timestamp: '2025-06-20T14:04:21.090Z'
+}
+Message received: {
+  id: 1750428284065,
+  text: 'How are you',
+  sender: 'ZQWTMSh-KzPE7v5EAAAD',
+  senderName: 'Tanmy',
+  to: null,
+  timestamp: '2025-06-20T14:04:44.065Z'
+}
+Client disconnected: ZQWTMSh-KzPE7v5EAAAD
+Client disconnected: yeMDh7yYTUgkQMdBAAAB
+Server running on port 7777
+To connect from other computers on your network, use http://<your-ip-address>:7777
+New client connected: D5wGLXd3S_gtVTiUAAAB
+Client disconnected: D5wGLXd3S_gtVTiUAAAB
+New client connected: AxyM_h9f9AmZykTZAAAD
+Message received: {
+  id: 1750428406851,
+  text: 'fef',
+  sender: 'AxyM_h9f9AmZykTZAAAD',
+  senderName: 'hlo',
+  to: null,
+  timestamp: '2025-06-20T14:06:46.851Z'
+}
+Client disconnected: AxyM_h9f9AmZykTZAAAD

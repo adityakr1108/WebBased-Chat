@@ -4,8 +4,13 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 
+// Add new features requirements
+const { Translate } = require('@google-cloud/translate').v2;
+const translate = new Translate();
+
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 // Serve static files from the React build directory in production
 if (process.env.NODE_ENV === 'production') {
@@ -18,90 +23,153 @@ if (process.env.NODE_ENV === 'production') {
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*", // Allow connections from any origin
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
 
-// Keep track of connected users
+// Keep track of connected users with enhanced status
 let users = [];
+let reactions = new Map(); // Store message reactions
 
 // Handle socket connections
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
   
-  // Wait for the user to provide their username
-  socket.on('set_username', (username) => {
-    // Add user to the list with the provided name
+  // Enhanced user status handling
+  socket.on('set_username', (userData) => {
+    const { username, avatar, status, customStatus } = userData;
     const user = {
       id: socket.id,
       name: username,
-      online: true
+      avatar: avatar || 'default-avatar.png',
+      online: true,
+      status: status || 'online',
+      customStatus: customStatus || '',
+      lastActive: new Date().toISOString()
     };
     
     users.push(user);
-    
-    // Broadcast the updated users list to everyone
     io.emit('users_update', users);
-    
-    // Send the user their own info
     socket.emit('user_info', user);
-      // Notify others that a new user has joined
+    
+    // Enhanced join message with custom animation
     socket.broadcast.emit('new_message', {
       id: Date.now(),
       text: `${username} has joined the chat`,
       sender: 'system',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      effect: 'sparkle' // Special effect for join messages
     });
   });
-  
-  // Handle new messages
-  socket.on('send_message', (messageData) => {
-    console.log('Message received:', messageData);
-    // Broadcast the message to the recipient or to everyone
-    if (messageData.to) {
-      // Direct message to a specific user
-      io.to(messageData.to).emit('new_message', messageData);
-      // Also send back to the sender
-      socket.emit('new_message', messageData);
-    } else {
-      // Broadcast to everyone
-      io.emit('new_message', messageData);
+
+  // Handle message reactions
+  socket.on('add_reaction', ({ messageId, reaction, userId }) => {
+    if (!reactions.has(messageId)) {
+      reactions.set(messageId, new Map());
     }
+    const messageReactions = reactions.get(messageId);
+    messageReactions.set(userId, reaction);
+    
+    io.emit('reaction_update', {
+      messageId,
+      reactions: Array.from(messageReactions.entries())
+    });
   });
-  
-  // Handle typing events
-  socket.on('typing', (typingData) => {
-    const { userId, userName, to } = typingData;
+
+  // Handle voice messages
+  socket.on('voice_message', (data) => {
+    const { audioBlob, to } = data;
+    const message = {
+      id: Date.now(),
+      type: 'voice',
+      sender: socket.id,
+      audioBlob,
+      timestamp: new Date().toISOString()
+    };
     
     if (to) {
-      // Send typing notification only to the recipient
-      io.to(to).emit('user_typing', { userId, userName, to });
+      io.to(to).emit('new_voice_message', message);
+      socket.emit('new_voice_message', message);
     } else {
-      // Broadcast typing to everyone except sender
-      socket.broadcast.emit('user_typing', { userId, userName, to: null });
+      io.emit('new_voice_message', message);
     }
   });
-  
-  // Handle disconnect
+
+  // Handle message translation
+  socket.on('translate_message', async ({ messageId, text, targetLang }) => {
+    try {
+      const [translation] = await translate.translate(text, targetLang);
+      socket.emit('translation_result', {
+        messageId,
+        translation,
+        targetLang
+      });
+    } catch (error) {
+      console.error('Translation error:', error);
+    }
+  });
+
+  // Handle message effects
+  socket.on('send_message', (messageData) => {
+    const enhancedMessage = {
+      ...messageData,
+      effect: messageData.effect || null,
+      reactions: [],
+      translated: false
+    };
+
+    if (messageData.to) {
+      io.to(messageData.to).emit('new_message', enhancedMessage);
+      socket.emit('new_message', enhancedMessage);
+    } else {
+      io.emit('new_message', enhancedMessage);
+    }
+  });
+
+  // Handle user status updates
+  socket.on('update_status', ({ status, customStatus }) => {
+    const userIndex = users.findIndex(u => u.id === socket.id);
+    if (userIndex !== -1) {
+      users[userIndex].status = status;
+      users[userIndex].customStatus = customStatus;
+      users[userIndex].lastActive = new Date().toISOString();
+      io.emit('users_update', users);
+    }
+  });
+
+  // Enhanced typing indicator with status
+  socket.on('typing', (typingData) => {
+    const { userId, userName, to } = typingData;
+    const user = users.find(u => u.id === userId);
+    const typingInfo = {
+      userId,
+      userName,
+      avatar: user?.avatar,
+      status: user?.status,
+      to
+    };
+    
+    if (to) {
+      io.to(to).emit('user_typing', typingInfo);
+    } else {
+      socket.broadcast.emit('user_typing', typingInfo);
+    }
+  });
+
+  // Handle disconnect with enhanced status
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-    // Find the user who disconnected
     const disconnectedUser = users.find(u => u.id === socket.id);
-    
-    // Remove user from the list
     users = users.filter(u => u.id !== socket.id);
-    
-    // Broadcast updated users list
     io.emit('users_update', users);
     
-    // Notify others that a user has left (if the user had set a username)
     if (disconnectedUser) {
       io.emit('new_message', {
         id: Date.now(),
         text: `${disconnectedUser.name} has left the chat`,
         sender: 'system',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        effect: 'fade' // Special effect for leave messages
       });
     }
   });
