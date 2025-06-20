@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App Network Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      color: #4a6fa5;
+    }
+    .test-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .status {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+    button {
+      background-color: #4a6fa5;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #3a5985;
+    }
+    code {
+      background-color: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat App Network Test</h1>
+  
+  <div class="test-card">
+    <h2>Connection Information</h2>
+    <p>Current URL: <code id="current-url"></code></p>
+    <p>Hostname: <code id="hostname"></code></p>
+  </div>
+  
+  <div class="test-card">
+    <h2>Test Socket.io Server Connection</h2>
+    <p>This will test if your browser can connect to the Socket.io server at port 5000.</p>
+    <button id="test-socket">Test Socket Connection</button>
+    <div id="socket-status" class="status"></div>
+  </div>
+
+  <div class="test-card">
+    <h2>Troubleshooting Tips</h2>
+    <ul>
+      <li>Make sure both computers are connected to the same network</li>
+      <li>If using WiFi works but Ethernet doesn't, try using your computer's hostname</li>
+      <li>Check that no firewall is blocking ports 3000 or 5000</li>
+      <li>Try temporarily disabling your firewall</li>
+      <li>Make sure the server is running with <code>npm run dev</code></li>
+    </ul>
+  </div>
+
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script>
+    // Display current URL and hostname
+    document.getElementById('current-url').textContent = window.location.href;
+    document.getElementById('hostname').textContent = window.location.hostname;
+    
+    // Socket test
+    document.getElementById('test-socket').addEventListener('click', function() {
+      const socketStatus = document.getElementById('socket-status');
+      socketStatus.className = 'status';
+      socketStatus.textContent = 'Testing connection...';
+        const hostname = window.location.hostname;
+      const serverUrl = hostname === 'localhost' || hostname === '127.0.0.1' 
+        ? 'http://localhost:7777'
+        : `http://${hostname}:7777`;
+      
+      try {
+        const socket = io(serverUrl, { timeout: 5000 });
+        
+        socket.on('connect', function() {
+          socketStatus.textContent = '✅ Connected to Socket.io server successfully!';
+          socketStatus.classList.add('success');
+          
+          // Disconnect after successful test
+          setTimeout(() => {
+            socket.disconnect();
+          }, 2000);
+        });
+        
+        socket.on('connect_error', function(err) {
+          socketStatus.textContent = `❌ Error connecting to Socket.io server: ${err.message}`;
+          socketStatus.classList.add('error');
+        });
+        
+        socket.on('disconnect', function() {
+          console.log('Socket disconnected');
+        });
+        
+      } catch (err) {
+        socketStatus.textContent = `❌ Error: ${err.message}`;
+        socketStatus.classList.add('error');
+      }
+    });
+  </script>
+</body>
+</html>
