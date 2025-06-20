@@ -4,10 +4,6 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 
-// Add new features requirements
-const { Translate } = require('@google-cloud/translate').v2;
-const translate = new Translate();
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -23,9 +19,15 @@ if (process.env.NODE_ENV === 'production') {
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
+    origin: process.env.NODE_ENV === 'production' ? 
+      'https://webbased-chat.onrender.com' : 
+      'http://localhost:3000',
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  transports: ['websocket', 'polling'],
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 // Keep track of connected users with enhanced status
@@ -93,20 +95,6 @@ io.on('connection', (socket) => {
       socket.emit('new_voice_message', message);
     } else {
       io.emit('new_voice_message', message);
-    }
-  });
-
-  // Handle message translation
-  socket.on('translate_message', async ({ messageId, text, targetLang }) => {
-    try {
-      const [translation] = await translate.translate(text, targetLang);
-      socket.emit('translation_result', {
-        messageId,
-        translation,
-        targetLang
-      });
-    } catch (error) {
-      console.error('Translation error:', error);
     }
   });
 

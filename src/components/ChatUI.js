@@ -24,27 +24,21 @@ const ChatUI = () => {
   const messagesEndRef = useRef(null);
     // Initialize socket connection
   useEffect(() => {
-    // Connect to the socket server using the current hostname
-    // This allows connection from different computers on the same network
-    let serverUrl;
-    
-    // Get the hostname from the URL
-    const hostname = window.location.hostname;
-      // If we're using localhost, connect to localhost
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      serverUrl = 'http://localhost:7777';
-    } 
-    // If connecting via IP address or hostname, use that
-    else {
-      serverUrl = `http://${hostname}:7777`;
-    }
-    
-    console.log('Connecting to socket server:', serverUrl);
-    const newSocket = io(serverUrl);
+    const serverUrl = process.env.NODE_ENV === 'production'
+      ? 'https://webbased-chat.onrender.com'  // Production URL
+      : 'http://localhost:7777';              // Development URL
+
+    const newSocket = io(serverUrl, {
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000
+    });
+
     setSocket(newSocket);
 
     // Cleanup on unmount
-    return () => newSocket.disconnect();
+    return () => newSocket.close();
   }, []);
 
   // Set up socket event listeners

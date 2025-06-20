@@ -34,3 +34,19 @@ Message received: {
   timestamp: '2025-06-20T14:06:46.851Z'
 }
 Client disconnected: AxyM_h9f9AmZykTZAAAD
+Server running on port 7777
+To connect from other computers on your network, use http://<your-ip-address>:7777
+New client connected: JG_kNJI15sqA_1U2AAAB
+New client connected: LcPR9NZZ6mPX76COAAAD
+Client disconnected: LcPR9NZZ6mPX76COAAAD
+New client connected: UoV6yyDxFw2D-qteAAAF
+Client disconnected: UoV6yyDxFw2D-qteAAAF
+New client connected: hqfY-HRM2i265pU-AAAH
+Message received: {
+  id: 1750428956249,
+  text: 'hlo',
+  sender: 'hqfY-HRM2i265pU-AAAH',
+  senderName: 'Hlo',
+  to: null,
+  timestamp: '2025-06-20T14:15:56.249Z'
+}
